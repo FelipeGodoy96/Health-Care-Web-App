@@ -1,0 +1,41 @@
+$enable-grid-classes: false;
+$enable-cssgrid: true;
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+
+.conteudo {
+  position: relative;
+  top: 50px;
+}
+
+.container {
+h1 {
+  color: blue;
+}
+}
+
+.errorBackground {
+ color: lightcoral;
+  border: red;
+}
+
+#app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  position: relative;
+.loading_button {
+  position: absolute;
+  align-self: center;
+  width: 5vh;
+  height: 5vh;
+}
+.loadingtext {
+  position: absolute;
+  align-self: center;
+  transform: translateY(50px);
+}
+}
+
+
