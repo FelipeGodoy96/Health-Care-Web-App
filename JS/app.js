@@ -1,9 +1,8 @@
 // ----------------------------------------------------------------
 // CONSTANTES
 // ----------------------------------------------------------------
-const storageKey = 'savedAccount'
+const storageKey = 'GlobalStorage'
 const db = window.localStorage
-db.setItem('0', '0')
 
 // ----------------------------------------------------------------
 // utilitário
@@ -15,8 +14,16 @@ function updateElement(id, textOrNode) {
   return element.append(textOrNode)
 }
 
+function searchDb(key) {
+  if (!JSON.parse(db.getItem(key))) {
+    return false
+  } else {
+    return JSON.parse(db.getItem(key))
+  }
+}
+
 function logout() {
-  updateState('account', null)
+  // updateState('account', null)
   navigate('/register')
 }
 
@@ -59,17 +66,21 @@ function updateRoute() {
 // GLOBAL
 // ----------------------------------------------------------------
 
-let state = Object.freeze({
-  account: null
-})
+// let state = Object.freeze({
+//   account: null
+// })
 
-function updateState(property, newData) {
-  state = Object.freeze({
-    ...state,
-    [property]: newData
-  })
-  localStorage.setItem(storageKey, JSON.stringify(state.account))
+function updateState(key, prop, value) {
+  teste = searchDb(key)
 }
+
+// function updateState(property, newData) {
+//   state = Object.freeze({
+//     ...state,
+//     [property]: newData
+//   })
+//   localStorage.setItem(storageKey, JSON.stringify(state.account))
+// }
 
 // ----------------------------------------------------------------
 // CADASTRO
@@ -79,7 +90,7 @@ function updateState(property, newData) {
 
 let account = null
 
-function Costumer(name, email, birthday, subscription, pw) {
+function User(name, email, birthday, subscription, pw) {
   this.name = name
   this.email = email
   this.birthday = birthday
@@ -87,21 +98,6 @@ function Costumer(name, email, birthday, subscription, pw) {
   this.pw = pw
   this.age = ''
 }
-
-// async function createAccount(account) {
-//   const birthday = document.getElementById('birthday').value
-//   const costumerName = document.getElementById('name').value
-//   const email = document.getElementById('email').value
-//   const subscription = document.getElementById('subscription').value
-//   const pw = document.getElementById('password').value
-//   const registerOnStorage = document.getElementById('registrate')
-//   db.setItem(
-//     `${email}`,
-//     JSON.stringify(
-//       new Costumer(costumerName, email, birthday, subscription, pw)
-//     )
-//   )
-// }
 
 function createAccount(email, account) {
   return db.setItem(email, account)
@@ -120,21 +116,14 @@ function register() {
   const jsonData = JSON.stringify(data)
   // inicio condição validação
   const emailElement = document.getElementById('email')
-  var dbElements = []
   if (emailElement.className == 'form-control is-valid') {
-    for (let i = 0; i < db.length; i++) {
-      dbElements.push(db.key(i))
-    }
-    if (
-      dbElements.filter(function (element) {
-        return element == emailElement.value
-      }) == emailElement.value
-    ) {
+    if (searchDb(emailElement.value).email == emailElement.value) {
       updateElement('registerError', 'Este e-mail já está cadastrado!')
     } else {
       createAccount(emailElement.value, jsonData)
       updateElement('registerError', 'Conta criada com sucesso!')
-      setTimeout("navigate('/calc')", 2000)
+      updateState('GlobalStorage')
+      setTimeout("navigate('/calc')", 1500)
     }
   } else {
     updateElement('registerError', 'E-mail inválido')
@@ -142,7 +131,7 @@ function register() {
   // fim condição validação
 }
 
-function validarEmail() {
+const validateEmail = () => {
   let emailElement = document.getElementById('email')
   let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (regex.test(emailElement.value) == true) {
@@ -154,16 +143,29 @@ function validarEmail() {
   }
 }
 
-// const resetMsg = () => {
-//   let emailElement = document.getElementById('email')
-//   if (validarEmail() == true) {
-//     return (emailElement.className = 'form-control')
-//   } else if ((emailElement.value = '')) {
-//     return (emailElement.className = 'form-control')
-//   } else if (emailElement.className == 'form-control is-invalid') {
-//     return (emailElement.className = 'form-control')
-//   }
-// }
+const validateLoginEmail = () => {
+  let emailElement = document.getElementById('emailLogin')
+  let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (regex.test(emailElement.value) == true) {
+    return (emailElement.className = 'form-control is-valid')
+  } else if (emailElement.value == '') {
+    return (emailElement.className = 'form-control')
+  } else {
+    return (emailElement.className = 'form-control is-invalid')
+  }
+}
+
+const resetLoginMsg = () => {
+  let emailElement = document.getElementById('emailLogin')
+  if (validateLoginEmail() == true) {
+    return (emailElement.className = 'form-control')
+  } else if ((emailElement.value = '')) {
+    return (emailElement.className = 'form-control')
+  } else if (emailElement.className == 'form-control is-invalid') {
+    updateElement('loginMsg', '')
+    return (emailElement.className = 'form-control')
+  }
+}
 
 // SIMPLES RESET DE STATUS //
 
@@ -172,6 +174,34 @@ const resetMsg = () => {
   if (emailaddress.className == 'form-control is-invalid') {
     updateElement('registerError', '')
     return (emailaddress.className = 'form-control')
+  }
+}
+
+// const resetLoginMsg = () => {
+//   let emailaddress = document.getElementById('emailLogin')
+//   if (emailaddress.className == 'form-control is-invalid') {
+//     updateElement('loginMsg', '')
+//     return (emailaddress.className = 'form-control')
+//   }
+// }
+
+function login() {
+  const emailLogin = document.getElementById('emailLogin').value
+  const passwordLogin = document.getElementById('passwordLogin').value
+  if (
+    searchDb(emailLogin).email == emailLogin &&
+    searchDb(emailLogin).pw == passwordLogin
+  ) {
+    updateElement('loginMsg', 'Login realizado com sucesso!')
+    // updateState(emailLogin, 'active', 'true')
+    setTimeout("navigate('/calc')", 1500)
+  } else if (
+    searchDb(emailLogin).email == emailLogin &&
+    searchDb(emailLogin).pw != passwordLogin
+  ) {
+    updateElement('loginMsg', 'Senha incorreta, tente novamente.')
+  } else {
+    updateElement('loginMsg', 'E-mail não cadastrado.')
   }
 }
 
@@ -185,13 +215,10 @@ function formulaeIMC(height, weight) {
 
 function calculateIMC() {
   const height = document.getElementById('altura').value
-  console.log(height)
   const weight = document.getElementById('massa').value
-  console.log(weight)
-  const element = document.getElementById('valueIMC')
-  console.log(element)
-  updateElement('valueIMC', `${formulaeIMC(height, weight).toFixed(2)}`)
-  // element.innerHTML = formulaeIMC(height, weight).toFixed(2)
+  data = formulaeIMC(height, weight).toFixed(2)
+  const text = 'O seu IMC é de '
+  updateElement('valueIMC', text + data)
 }
 
 // ----------------------------------------------------------------
@@ -199,15 +226,17 @@ function calculateIMC() {
 // ----------------------------------------------------------------
 
 function init() {
-  // Restore state
-  // const savedState = localStorage.getItem(storageKey)
-  // if (savedState) {
-  //   updateState('account', JSON.parse(savedState))
-  // }
+  db.setItem('0', '0')
+  const savedState = localStorage.getItem(storageKey)
+  if (savedState) {
+    updateState('account', JSON.parse(savedState))
+  }
+
+  // define um item para "destravar" a db.
+  db.setItem('0', '0')
 
   // Update route for browser back/next buttons
-  window.onpopstate = () => updateRoute()
-  updateRoute()
+  setTimeout('updateRoute()', 1500)
 }
 
 init()
