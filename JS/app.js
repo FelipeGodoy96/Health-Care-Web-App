@@ -1,8 +1,11 @@
 // ----------------------------------------------------------------
 // CONSTANTES
 // ----------------------------------------------------------------
-const storageKey = 'GlobalStorage'
+const globalStorage = 'savedState'
 const db = window.localStorage
+var globalObject = {
+  activeAccount: 'false'
+}
 
 // ----------------------------------------------------------------
 // utilitário
@@ -23,7 +26,7 @@ function searchDb(key) {
 }
 
 function logout() {
-  // updateState('account', null)
+  updateState(globalStorage, 'activeAccount', false)
   navigate('/register')
 }
 
@@ -71,7 +74,11 @@ function updateRoute() {
 // })
 
 function updateState(key, prop, value) {
-  teste = searchDb(key)
+  const object = searchDb(key)
+  var clone = object
+  db.removeItem(key)
+  clone[prop] = value
+  db.setItem(key, JSON.stringify(clone))
 }
 
 // function updateState(property, newData) {
@@ -122,7 +129,7 @@ function register() {
     } else {
       createAccount(emailElement.value, jsonData)
       updateElement('registerError', 'Conta criada com sucesso!')
-      updateState('GlobalStorage')
+      updateState(globalStorage, 'activeAccount', emailElement.value)
       setTimeout("navigate('/calc')", 1500)
     }
   } else {
@@ -193,7 +200,7 @@ function login() {
     searchDb(emailLogin).pw == passwordLogin
   ) {
     updateElement('loginMsg', 'Login realizado com sucesso!')
-    // updateState(emailLogin, 'active', 'true')
+    updateState(globalStorage, 'activeAccount', emailLogin)
     setTimeout("navigate('/calc')", 1500)
   } else if (
     searchDb(emailLogin).email == emailLogin &&
@@ -226,17 +233,13 @@ function calculateIMC() {
 // ----------------------------------------------------------------
 
 function init() {
-  db.setItem('0', '0')
-  const savedState = localStorage.getItem(storageKey)
-  if (savedState) {
-    updateState('account', JSON.parse(savedState))
-  }
-
-  // define um item para "destravar" a db.
-  db.setItem('0', '0')
-
-  // Update route for browser back/next buttons
+  createAccount(globalStorage, JSON.stringify(globalObject))
   setTimeout('updateRoute()', 1500)
 }
 
 init()
+
+function welcome() {
+  const email = searchDb(globalStorage).activeAccount
+  updateElement('userName', searchDb(email).name)
+}
