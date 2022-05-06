@@ -220,12 +220,18 @@ function formulaeIMC(height, weight) {
   return weight / (height * height)
 }
 
-function calculateIMC() {
+function saveRegister() {
   const height = document.getElementById('altura').value
   const weight = document.getElementById('massa').value
+  const sexElement = document.getElementById('sexo')
+  const sex = sexElement.options[sexElement.selectedIndex].textContent
   data = formulaeIMC(height, weight).toFixed(2)
   const text = 'O seu IMC é de '
   updateElement('valueIMC', text + data)
+  updateState(searchDb(globalStorage).activeAccount, 'height', height)
+  updateState(searchDb(globalStorage).activeAccount, 'weight', weight)
+  updateState(searchDb(globalStorage).activeAccount, 'IMC', data)
+  updateState(searchDb(globalStorage).activeAccount, 'sexo', sex)
 }
 
 // ----------------------------------------------------------------
@@ -234,7 +240,7 @@ function calculateIMC() {
 
 function init() {
   createAccount(globalStorage, JSON.stringify(globalObject))
-  setTimeout('updateRoute()', 1500)
+  setTimeout('updateRoute()', 300)
 }
 
 init()

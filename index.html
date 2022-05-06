@@ -187,8 +187,18 @@
             <label for="massa">peso (kg)</label>
           </div>
         </div>
+        <div class="g-col-2">
+          <div class="form-floating">
+            <select class="form-select" id="sexo" aria-label="sexo" required>
+              <option value="null" disabled selected></option>
+              <option value="masc">masculino</option>
+              <option value="fem">feminino</option>
+            </select>
+            <label for="idade">sexo</label>
+          </div>
+        </div>
         <div class="g-col-12">
-          <button type="button" class="btn btn-primary" onclick="calculateIMC()">Gravar</button>
+          <button type="button" class="btn btn-primary" onclick="saveRegister()">Gravar</button>
         </div>
       </div>
     </form>
